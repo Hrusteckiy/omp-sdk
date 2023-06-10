@@ -14,7 +14,7 @@
 CBlender_Tree::CBlender_Tree()
 {
 	description.CLS		= B_TREE;
-	description.version	= 1;
+	description.version	= 2;
 	oBlend.value		= FALSE;
 	oNotAnTree.value	= FALSE;
 }
@@ -27,16 +27,21 @@ CBlender_Tree::~CBlender_Tree()
 void	CBlender_Tree::Save		(IWriter& fs )
 {
 	IBlender::Save		(fs);
-	xrPWRITE_PROP		(fs,"Alpha-blend",	xrPID_BOOL,		oBlend);
-	xrPWRITE_PROP		(fs,"Object LOD",	xrPID_BOOL,		oNotAnTree);
+	xrPWRITE_PROP		(fs, "Alpha-blend",				xrPID_BOOL,		oBlend);
+	xrPWRITE_PROP		(fs, "Object LOD",				xrPID_BOOL,		oNotAnTree);
+	xrPWRITE_PROP		(fs, "Subsurface scattering",	xrPID_BOOL,		oSurfaceScattering);
 }
 
 void	CBlender_Tree::Load		(IReader& fs, u16 version )
 {
 	IBlender::Load		(fs,version);
-	xrPREAD_PROP		(fs,xrPID_BOOL,		oBlend);
+	xrPREAD_PROP		(fs, xrPID_BOOL,		oBlend);
 	if (version>=1)		{
-		xrPREAD_PROP		(fs,xrPID_BOOL,		oNotAnTree);
+		xrPREAD_PROP	(fs, xrPID_BOOL,		oNotAnTree);
+	}
+	if (version >= 2)
+	{
+		xrPREAD_PROP	(fs, xrPID_BOOL, oSurfaceScattering);
 	}
 }
 
@@ -175,13 +180,19 @@ void	CBlender_Tree::Compile	(CBlender_Compile& C)
 	LPCSTR	tvs_s;
 	if (oNotAnTree.value)	
 	{ 
-		tvs="tree_s";
+		if (oSurfaceScattering.value)
+			tvs = "tree_s_sss";
+		else
+			tvs = "tree_s";
 		if (oBlend.value)	tvs_s="shadow_direct_tree_s_aref"; 
 		else	tvs_s="shadow_direct_tree_s"; 
 	}
 	else
 	{
-		tvs				= "tree";
+		if (oSurfaceScattering.value)
+			tvs = "tree_sss";
+		else
+			tvs = "tree";
 		if (oBlend.value)	tvs_s="shadow_direct_tree_aref"; 
 		else	tvs_s="shadow_direct_tree"; 
 	}
