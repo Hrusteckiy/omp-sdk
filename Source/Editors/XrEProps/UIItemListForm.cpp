@@ -482,7 +482,7 @@ bool UIItemListForm::IsFloderSelected(Node* Node)
 {
 	if (m_Flags.test(fMultiSelect))
 	{
-		return Node->Object->selected;
+		return Node->Object?Node->Object->selected:Node == m_edit_node;
 	}
 	else if (m_SelectedItems.size() && m_SelectedItems.back() == Node->Object)
 	{
